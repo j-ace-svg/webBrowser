@@ -1,35 +1,61 @@
 " Documentation {{{1
 "
+" Upstream: {{{2
 " Name: webBrowser.vim
 " Version: 1.6
 " Description: Uses the lynx text browser to browse websites and local files and return the rendered web pages inside vim. The links in the web pages may be "clicked" to follow them, so it turns vim into a simple web text based web browser. This plugin is based on the "browser.vim" plugin.
 " Author: Alexandre Viau (alexandreviau@gmail.com)
 " Website: The latest version is found on "vim.org"
 "
-" Installation: {{{2 
+" Fork: {{{2
+" Version: 1.6.1
+" Fork Author: John Montgomery (j.ace.svg@gmail.com)
+"
+" (Note: Versioning is MAJOR.MINOR-UPSTREAM.MINOR-DOWNSTREAM)
+"
+" Installation: {{{2
 " Copy the plugin to the vim plugin directory.
-" In the lynx.cfg file, set the following parameters: 
+" In the lynx.cfg file, set the following parameters:
+" ```
 " ACCEPT_ALL_COOKIES:TRUE
 " MAKE_LINKS_FOR_ALL_IMAGES:TRUE
+" ```
 " Change the following paths to your lynx files:
-" let g:lynxPath = 'c:\lynx'
-" let g:lynxExe = g:lynxPath . 'lynx.exe'
+" ```VimL
+" let g:lynxPath = $HOME.'/.vim/lynx/'
+" let g:lynxExe = '/usr/bin/lynx'
 " let g:lynxCfg = '-cfg=' . g:lynxPath . 'lynx.cfg'
 " let g:lynxLss = '-lss=' . g:lynxPath . 'lynx.lss'
 " let g:lynxCmd = g:lynxExe . ' ' . g:lynxCfg . ' ' . g:lynxLss
-" let s:lynxDumpPath = 'c:\lynx\dump'
-" let g:lynxToolsPath = 'c:\lynx\tools'
+"
+" let g:WbLynxDumpPath = g:lynxPath . '/dump/'
+" let g:lynxToolsPath = g:lynxPath . '/tools/'
+" ```
 "
 " Usage: {{{2
-" <leader>wb :WebBrowser (Open a new web browser tab with the address specified)
-" <leader>wc :exe 'WebBrowser "' . @* . '"'<cr> (Open a new web browser tab with the address in the clipboard)
-" <leader>wg :exe 'WebBrowser www.google.com/search?q="' . input("Google ") . '"'<cr> (Do a google search using the specified search keywords and open the results in a new tab)
-" <leader>wp :exe 'WebBrowser www.wikipedia.com/wiki/"' . input("Wikipedia ") . '"'<cr> (Do a wikipedia search using the specified search keywords and open the results in a new tab)
-" <leader>wd :WebDump (Downloads the specified webpage without opening it in vim)
-" <space>l (Open link)
-" <space>h (Previous page ("back button"))
-" <space>j (Highlight links and go to next link)
-" <space>k (Highlight links and go to previous link)
+" ```
+" L (Open link)
+" <C-l> (Jump to link at bottom of page)
+" H (Previous page ("back button"))
+" J (Highlight links and go to next link)
+" K (Highlight links and go to previous link)
+" gf (Open prompt for address to navigate to)
+" gF (Navigate to the address under the cursor)
+" ```
+"
+" Suggested mappings: {{{2
+" ```VimL
+" " Open a new web browser tab with the address specified
+" <leader>wb :WebBrowser
+" " Open a new web browser tab with the address in the clipboard
+" <leader>wc :exe 'WebBrowser "' . @* . '"'<cr>
+" " Do a google search using the specified search keywords and open the results in a new tab
+" <leader>wg :exe 'WebBrowser www.google.com/search?q="' . input("Google ") . '"'<cr>
+" " Do a wikipedia search using the specified search keywords and open the results in a new tab
+" <leader>wp :exe 'WebBrowser www.wikipedia.com/wiki/"' . input("Wikipedia ") . '"'<cr>
+" " Downloads the specified webpage without opening it in vim
+" <leader>wd :WebDump
+" ```
 "
 " Todo: {{{2
 " - Redo the code that gets the link number and search for it at the end of the file (no need to move cursor) and to do it in a mapping, it may be done in a function
@@ -37,7 +63,7 @@
 " - Add links bar like vimExplorer (favorites & history) with links not from utl but with brackets [http://yahoo.com] thus no need for utl
 " - Use image_links and accept_all_cookies options in the command run from the plugin instead of having to modify the .cfg file
 "
-" History {{{2
+" History: {{{2
 " 1.1 {{{3
 " - Changed the file format to unix
 " 1.2 {{{3
@@ -52,6 +78,17 @@
 " - Added the webdump command and function to download in batch
 " 1.6 {{{3
 " - Added documentation and usage
+" 1.6.1 {{{3
+" - Port to Unix file paths by default
+" - Make lynx interaction globally configurable
+" - Use nnoremap mappings
+" - Uniformly use `g:lynxPath`
+" - Fix formatting
+" - Make web page buffers unmodifiable
+" - Create a new buffer when browsing in the same tab
+" - Improve link finding
+" - Use HLKJ rather than leader key bindings
+" - Add gf and gF bindings
 
 " Commands: To start the plugin {{{1
 com! -nargs=+ WebBrowser enew | call OpenWebBrowser(<q-args>, 0)
@@ -190,3 +227,6 @@ function! OpenWebBrowser(address, openInNewTab) " {{{2
     " Add address to append register which acts as an history for the current session
     "let @H = strftime("%x %X") . ' <url:' . g:WbAddress . '>'
 endfun
+
+" }}}
+" vim: foldmethod=marker:foldlevel=1
