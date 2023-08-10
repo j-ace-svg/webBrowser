@@ -12,13 +12,13 @@
 " ACCEPT_ALL_COOKIES:TRUE
 " MAKE_LINKS_FOR_ALL_IMAGES:TRUE
 " Change the following paths to your lynx files:
-" let s:lynxPath = 'c:\lynx'
-" let s:lynxExe = s:lynxPath . 'lynx.exe'
-" let s:lynxCfg = '-cfg=' . s:lynxPath . 'lynx.cfg'
-" let s:lynxLss = '-lss=' . s:lynxPath . 'lynx.lss'
-" let s:lynxCmd = s:lynxExe . ' ' . s:lynxCfg . ' ' . s:lynxLss
+" let g:lynxPath = 'c:\lynx'
+" let g:lynxExe = g:lynxPath . 'lynx.exe'
+" let g:lynxCfg = '-cfg=' . g:lynxPath . 'lynx.cfg'
+" let g:lynxLss = '-lss=' . g:lynxPath . 'lynx.lss'
+" let g:lynxCmd = g:lynxExe . ' ' . g:lynxCfg . ' ' . g:lynxLss
 " let s:lynxDumpPath = 'c:\lynx\dump'
-" let s:lynxToolsPath = 'c:\lynx\tools'
+" let g:lynxToolsPath = 'c:\lynx\tools'
 "
 " Usage: {{{2
 " <leader>wb :WebBrowser (Open a new web browser tab with the address specified)
@@ -54,42 +54,42 @@
 " - Added documentation and usage
 
 " Commands: To start the plugin {{{1
-com! -nargs=+ WebBrowser call OpenWebBrowser(<q-args>, 1)
+com! -nargs=+ WebBrowser enew | call OpenWebBrowser(<q-args>, 0)
 com! -nargs=1 WebDump call DoWebDump(<q-args>)
 
-" Mappings: To start the plugin {{{1
-" Open a new web browser tab with the address specified
-nmap <leader>wb :WebBrowser 
-" Open a new web browser tab with the address in the clipboard 
-nmap <leader>wc :exe 'WebBrowser "' . @* . '"'<cr>
-" Do a google search using the specified search keywords and open the results in a new tab
-nmap <leader>wg :exe 'WebBrowser www.google.com/search?q="' . input("Google ") . '"'<cr>
-" Do a wikipedia search using the specified search keywords and open the results in a new tab
-nmap <leader>wp :exe 'WebBrowser www.wikipedia.com/wiki/"' . input("Wikipedia ") . '"'<cr>
-" Downloads the specified webpage without opening it in vim
-nmap <leader>wd :WebDump
+"" Mappings: To start the plugin {{{1
+"" Open a new web browser tab with the address specified
+"nnoremap <leader>wb :WebBrowser
+"" Open a new web browser tab with the address in the clipboard
+"nnoremap <leader>wc :exe 'WebBrowser "' . @* . '"'<cr>
+"" Do a google search using the specified search keywords and open the results in a new tab
+"nnoremap <leader>wg :exe 'WebBrowser www.google.com/search?q="' . input("Google ") . '"'<cr>
+"" Do a wikipedia search using the specified search keywords and open the results in a new tab
+"nnoremap <leader>wp :exe 'WebBrowser www.wikipedia.com/wiki/"' . input("Wikipedia ") . '"'<cr>
+"" Downloads the specified webpage without opening it in vim
+"nnoremap <leader>wd :WebDump
 
 " Suggested mappings to add to your vimrc {{{2
 " Open a web browser tab with the address specified
-" nmap <insert> :WebBrowser 
-" Open a new web browser tab with the address in the clipboard 
-" nmap <s-insert> :exe 'WebBrowser ' . @*<cr>
+" nnoremap <insert> :WebBrowser
+" Open a new web browser tab with the address in the clipboard
+" nnoremap <s-insert> :exe 'WebBrowser ' . @*<cr>
 " Show dump (history-cache) directory
-" nmap <c-insert> :exe 'VimExplorerSP ' . g:WbLynxDumpPath<cr>
+" nnoremap <c-insert> :exe 'VimExplorerSP ' . g:WbLynxDumpPath<cr>
 " Do a google search using the specified search keywords and open the results in a new tab
-" nmap <delete> :exe 'WebBrowser www.google.com/search?q="' . input("Google ") . '"'<cr>
+" nnoremap <delete> :exe 'WebBrowser www.google.com/search?q="' . input("Google ") . '"'<cr>
 " Do a wikipedia search using the specified search keywords and open the results in a new tab
-" nmap <s-delete> :exe 'WebBrowser www.wikipedia.com/wiki/"' . input("Wikipedia ") . '"'<cr>
+" nnoremap <s-delete> :exe 'WebBrowser www.wikipedia.com/wiki/"' . input("Wikipedia ") . '"'<cr>
 
 " Variables {{{1
-let s:lynxPath = 'c:\lynx\'
-let s:lynxExe = s:lynxPath . 'lynx.exe'
-let s:lynxCfg = '-cfg=' . s:lynxPath . 'lynx.cfg'
-let s:lynxLss = '-lss=' . s:lynxPath . 'lynx.lss'
-let s:lynxCmd = s:lynxExe . ' ' . s:lynxCfg . ' ' . s:lynxLss
+let g:lynxPath = $HOME.'/.vim/lynx/'
+let g:lynxExe = '/usr/bin/lynx'
+let g:lynxCfg = '-cfg=' . g:lynxPath . 'lynx.cfg'
+let g:lynxLss = '-lss=' . g:lynxPath . 'lynx.lss'
+let g:lynxCmd = g:lynxExe . ' ' . g:lynxCfg . ' ' . g:lynxLss
 
-let g:WbLynxDumpPath = 'c:\lynx\dump\'
-let s:lynxToolsPath = 'c:\lynx\tools\'
+let g:WbLynxDumpPath = g:lynxPath . '/dump/'
+let g:lynxToolsPath = g:lynxPath . '/tools/'
 
 let g:WbAddress = ''
 
@@ -104,7 +104,7 @@ endif
 function! DoWebDump(address) " {{{2
     " Download a page to a file
     " Percent-encode some characters because it causes problems in the command line on the windows test computer {{{3
-    "! 	# 	$ 	& 	' 	( 	) 	* 	+ 	, 	/ 	: 	; 	= 	? 	@ 	[ 	]
+    "! 		# 		$ 		& 		' 		( 		) 		* 		+ 		, 		/ 		: 		; 		= 		? 		@ 		[ 		]
     "%21 	%23 	%24 	%26 	%27 	%28 	%29 	%2A 	%2B 	%2C 	%2F 	%3A 	%3B 	%3D 	%3F 	%40 	%5B 	%5D
     let l:address = substitute(a:address, '&', '\\%26', 'g')
     let l:address = substitute(l:address, '#', '\\%23', 'g')
@@ -125,21 +125,21 @@ function! DoWebDump(address) " {{{2
     let l:extLen = strlen(a:address) - l:extPos
     let l:extName = strpart(a:address, l:extPos, l:extLen)
     " Open the webpage/file and dump it using the lynx -dump feature to the dump directory {{{3
-    exe 'silent ! ' . s:lynxCmd . ' -dump ' . l:address . ' > "' . g:WbLynxDumpPath . l:dumpFile . '"'
+    exe 'silent ! ' . g:lynxCmd . ' -dump ' . l:address . ' > "' . g:WbLynxDumpPath . l:dumpFile . '"'
     " Select view method according to the page/file extension {{{3
     let l:vimFile = ''
     " View image files {{{4
     if l:extName == '.jpg' || l:extName == '.gif' || l:extName == '.png'
         " Windows
         if has('Win32')
-            exe 'silent !start "' . s:lynxToolsPath . 'i_view32.exe" "' . g:WbLynxDumpPath . l:dumpFile . '"'
+            exe 'silent !start "' . g:lynxToolsPath . 'i_view32.exe" "' . g:WbLynxDumpPath . l:dumpFile . '"'
         " Linux
         else
-            exe 'silent !"' . s:lynxToolsPath . 'i_view32.exe" "' . g:WbLynxDumpPath . l:dumpFile . '"'
+            exe 'silent !"' . g:lynxToolsPath . 'i_view32.exe" "' . g:WbLynxDumpPath . l:dumpFile . '"'
         endif
     " View pdf files {{{4
     elseif l:extName == '.pdf'
-        exe 'silent ! "' . s:lynxToolsPath . 'pdftotext.exe" "' . g:WbLynxDumpPath . l:dumpFile . '" "' . g:WbLynxDumpPath . l:dumpFile . '.txt"'
+        exe 'silent ! "' . g:lynxToolsPath . 'pdftotext.exe" "' . g:WbLynxDumpPath . l:dumpFile . '" "' . g:WbLynxDumpPath . l:dumpFile . '.txt"'
         let l:vimFile = g:WbLynxDumpPath . l:dumpFile . '.txt'
     " View any other extension (html, htm or no extension etc.) {{{4
     else
@@ -155,33 +155,38 @@ function! OpenWebBrowser(address, openInNewTab) " {{{2
     if l:vimFile != ''
         if a:openInNewTab == 1
             exe "tabnew"
-            exe "set buftype=nofile"
-            " <space>l (Open link)
-            exe 'nnoremap <buffer> <space>l F[h/^ *<c-r><c-w>. \(http\\|file\)<cr>f l"py$:call OpenWebBrowser("<c-r>p", 0)<cr>'
-            " <space>h (Previous page ("back button"))
-            exe 'nnoremap <buffer> <space>h :normal u<cr>'
-            " <space>j (Highlight links and go to next link)
-            exe "nnoremap <buffer> <space>j /\\d*\\]\\w*<cr>"
-            " <space>k (Highlight links and go to previous link)
-            exe "nnoremap <buffer> <space>k ?\\d*\\]\\w*<cr>"
         else
             " Clear the buffer
-            exe "norm ggdG"
+            set modifiable
+            exe "normal  ggdG"
         endif
+        exe "set buftype=nofile"
+        " L (Open link)
+        exe 'nnoremap <buffer> <silent> L F[h/^ *<c-r><c-w>. \zs\(http\\|file\)<cr>GN$?http<cr>"py$:call OpenWebBrowser("<c-r>p", 0)<cr>'
+        exe 'nnoremap <buffer> <silent> <C-l> F[h/^ *<c-r><c-w>. \zs\(http\\|file\)<cr>GN'
+        exe 'nnoremap <buffer> gf "py$:call OpenWebBrowser("<c-r>p", 0)<cr>'
+        exe 'nnoremap <buffer> gF :call OpenWebBrowser("", 0)<left><left><left><left><left>'
+        " H (Previous page ("back button"))
+        exe 'nnoremap <buffer> <silent> H :set modifiable<cr>:normal u<cr>:set nomodifiable<cr>'
+        " J (Highlight links and go to next link)
+        exe "nnoremap <buffer> <silent> J /\[\\zs\\d*\\]\\w*<cr>"
+        " K (Highlight links and go to previous link)
+        exe "nnoremap <buffer> <silent> K ?\[\\zs\\d*\\]\\w*<cr>"
         " Read the file in the buffer
         exe 'silent r ' . l:vimFile
         " Set syntax to have bold links
         syn reset
         syn match Keyword /\[\d*\]\w*/ contains=Ignore
-        syn match Ignore /\[\d*\]/ contained 
+        syn match Ignore /\[\d*\]/ contained
         exe "norm gg"
-        let g:WbAddress = substitute(a:address, '"', '', 'g') 
+        let g:WbAddress = substitute(a:address, '"', '', 'g')
         call append(0, [g:WbAddress])
         exe "norm k"
+        set nomodifiable
     else
         " Return to previous cursor position to return to where the link was executed
         exe "norm! \<c-o>"
-    endif 
+    endif
     " Add address to append register which acts as an history for the current session
     "let @H = strftime("%x %X") . ' <url:' . g:WbAddress . '>'
 endfun
