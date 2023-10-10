@@ -89,6 +89,10 @@
 " - Improve link finding
 " - Use HLKJ rather than leader key bindings
 " - Add gf and gF bindings
+" 1.6.2 {{{3
+" - Add vertical split option
+" - Only make current buffer unmodifiable
+" - Add autocommand to allow for external hooks
 
 " Commands: To start the plugin {{{1
 com! -nargs=+ WebBrowser enew | call OpenWebBrowser(<q-args>, 0)
@@ -185,16 +189,18 @@ function! DoWebDump(address) " {{{2
     return l:vimFile
 endfunction
 
-function! OpenWebBrowser(address, openInNewTab) " {{{2
+function! OpenWebBrowser(address, openInNewTabSplit) " {{{2
     " Download the file
     let l:vimFile = DoWebDump(a:address)
     " Open the dumped file in the buffer {{{3
     if l:vimFile != ''
-        if a:openInNewTab == 1
+        if a:openInNewTabSplit == 1
             exe "tabnew"
+        elseif a:openInNewTabSplit == 2
+            exe "vnew"
         else
             " Clear the buffer
-            set modifiable
+            setlocal modifiable
             exe "normal  ggdG"
         endif
         exe "set buftype=nofile"
@@ -204,7 +210,7 @@ function! OpenWebBrowser(address, openInNewTab) " {{{2
         exe 'nnoremap <buffer> gf "py$:call OpenWebBrowser("<c-r>p", 0)<cr>'
         exe 'nnoremap <buffer> gF :call OpenWebBrowser("", 0)<left><left><left><left><left>'
         " H (Previous page ("back button"))
-        exe 'nnoremap <buffer> <silent> H :set modifiable<cr>:normal u<cr>:set nomodifiable<cr>'
+        exe 'nnoremap <buffer> <silent> H :setlocal modifiable<cr>:normal u<cr>:setlocal nomodifiable<cr>'
         " J (Highlight links and go to next link)
         exe "nnoremap <buffer> <silent> J /\[\\zs\\d*\\]\\w*<cr>"
         " K (Highlight links and go to previous link)
@@ -218,8 +224,9 @@ function! OpenWebBrowser(address, openInNewTab) " {{{2
         exe "norm gg"
         let g:WbAddress = substitute(a:address, '"', '', 'g')
         call append(0, [g:WbAddress])
+        doautocmd User BrowseEnter
         exe "norm k"
-        set nomodifiable
+        setlocal nomodifiable
     else
         " Return to previous cursor position to return to where the link was executed
         exe "norm! \<c-o>"
