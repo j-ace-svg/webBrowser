@@ -93,6 +93,8 @@
 " - Add vertical split option
 " - Only make current buffer unmodifiable
 " - Add autocommand to allow for external hooks
+" 1.6.3 {{{3
+" - Add keybinding to open in external program
 
 " Commands: To start the plugin {{{1
 com! -nargs=+ WebBrowser enew | call OpenWebBrowser(<q-args>, 0)
@@ -215,6 +217,8 @@ function! OpenWebBrowser(address, openInNewTabSplit) " {{{2
         exe "nnoremap <buffer> <silent> J /\[\\zs\\d*\\]\\w*<cr>"
         " K (Highlight links and go to previous link)
         exe "nnoremap <buffer> <silent> K ?\[\\zs\\d*\\]\\w*<cr>"
+        " O (Open link in custom program)
+        exe 'nnoremap <buffer> <silent> O F[h/^ *<c-r><c-w>. \zs\(http\\|file\)<cr>GN$?http<cr>"py$<c-o><c-o>:exe "silent !" . input("Program > ") . " <c-r>p &"<cr>'
         " Read the file in the buffer
         exe 'silent r ' . l:vimFile
         " Set syntax to have bold links
